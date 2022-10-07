@@ -4,6 +4,7 @@ This file runs the experiment with code designed specifically for tabular data;
 i.e., the feature attribution is performed directly on the model.
 """
 
+import enum
 from typing import Any, Callable, Optional
 
 import numpy as np
@@ -14,19 +15,24 @@ import experiment
 import interpretability_methods
 
 
+class TabularDataset(enum.Enum):
+  WINE_QUALITY = 'wine_quality'
+
+
 class TabularExperiment(experiment.Experiment):
   """Object for experiments with a low number of features."""
 
-  def __init__(self, data: str) -> None:
-    if data == 'wine_quality':
+  def __init__(self, data: TabularDataset) -> None:
+    super().__init__()
+    if data == TabularDataset.WINE_QUALITY:
       self._wine_quality_data()
     else:
-      raise ValueError('Dataset ' + data + ' does not exist.')
+      raise ValueError('Dataset cannot be used for TabularExperiment.')
 
   def _wine_quality_data(self) -> None:
     """Set data to be tensorflow wine_quality dataset."""
 
-    self.feature_names = [
+    feature_names = [
         'fixed acidity',
         'volatile acidity',
         'citric acid',
@@ -40,7 +46,7 @@ class TabularExperiment(experiment.Experiment):
         'alcohol',
     ]
     self.n_data = 4898  # hardcoded, otherwise have to parse the whole dataset
-    self.n_features = len(self.feature_names)
+    self.n_features = len(feature_names)
     self.n_classes = 7
 
     data = tfds.load('wine_quality', split='train')
@@ -89,28 +95,9 @@ class TabularExperiment(experiment.Experiment):
     if n_eval_samples is None:
       n_eval_samples = np.min([5, self.n_data])
 
-    self.n_shap_true_negative = []
-    self.n_lime_true_negative = []
-    self.n_intgrad_true_negative = []
-    self.n_grad_true_negative = []
-    self.n_shap_true_positive = []
-    self.n_lime_true_positive = []
-    self.n_intgrad_true_positive = []
-    self.n_grad_true_positive = []
-    self.n_oracle_positive = []
-    self.n_experiment_samples = []
+    self.experiment_params.reset(n_repetitions)
 
-    for _ in range(n_repetitions):
-      n_shap_true_negative = 0
-      n_lime_true_negative = 0
-      n_intgrad_true_negative = 0
-      n_grad_true_negative = 0
-      n_shap_true_positive = 0
-      n_lime_true_positive = 0
-      n_intgrad_true_positive = 0
-      n_grad_true_positive = 0
-      n_oracle_positive = 0
-      n_experiment_samples = 0
+    for repetition_idx in range(n_repetitions):
 
       sample_idxs = np.random.randint(0, self.n_data, n_train_samples)
       sample_features_data = self.features_data[sample_idxs]
@@ -158,41 +145,29 @@ class TabularExperiment(experiment.Experiment):
                                                 class_list, feature_list))
 
           # how many 1's
-          n_oracle_positive += np.sum(oracle_value)
+          self.experiment_params.n_oracle_positive[repetition_idx] += np.sum(
+              oracle_value)
 
           # when oracle == 1, count 1's
-          n_shap_true_positive += np.sum(oracle_value * shap_value)
-          n_lime_true_positive += np.sum(oracle_value * lime_value)
-          n_intgrad_true_positive += np.sum(oracle_value * intgrad_value)
-          n_grad_true_positive += np.sum(oracle_value * grad_value)
+          self.experiment_params.n_shap_true_positive[
+              repetition_idx] += np.sum(oracle_value * shap_value)
+          self.experiment_params.n_lime_true_positive[
+              repetition_idx] += np.sum(oracle_value * lime_value)
+          self.experiment_params.n_intgrad_true_positive[
+              repetition_idx] += np.sum(oracle_value * intgrad_value)
+          self.experiment_params.n_grad_true_positive[
+              repetition_idx] += np.sum(oracle_value * grad_value)
 
           # when oracle == 0, count 0's
-          n_shap_true_negative += np.sum((1 - oracle_value) * (1 - shap_value))
-          n_lime_true_negative += np.sum((1 - oracle_value) * (1 - lime_value))
-          n_intgrad_true_negative += np.sum(
-              (1 - oracle_value) * (1 - intgrad_value))
-          n_grad_true_negative += np.sum((1 - oracle_value) * (1 - grad_value))
+          self.experiment_params.n_shap_true_negative[
+              repetition_idx] += np.sum((1 - oracle_value) * (1 - shap_value))
+          self.experiment_params.n_lime_true_negative[
+              repetition_idx] += np.sum((1 - oracle_value) * (1 - lime_value))
+          self.experiment_params.n_intgrad_true_negative[
+              repetition_idx] += np.sum(
+                  (1 - oracle_value) * (1 - intgrad_value))
+          self.experiment_params.n_grad_true_negative[
+              repetition_idx] += np.sum((1 - oracle_value) * (1 - grad_value))
 
-          n_experiment_samples += len(feature_list) * len(class_list)
-
-      self.n_shap_true_negative.append(n_shap_true_negative)
-      self.n_lime_true_negative.append(n_lime_true_negative)
-      self.n_intgrad_true_negative.append(n_intgrad_true_negative)
-      self.n_grad_true_negative.append(n_grad_true_negative)
-      self.n_shap_true_positive.append(n_shap_true_positive)
-      self.n_lime_true_positive.append(n_lime_true_positive)
-      self.n_intgrad_true_positive.append(n_intgrad_true_positive)
-      self.n_grad_true_positive.append(n_grad_true_positive)
-      self.n_oracle_positive.append(n_oracle_positive)
-      self.n_experiment_samples.append(n_experiment_samples)
-
-    self.n_shap_true_negative = np.array(self.n_shap_true_negative)
-    self.n_lime_true_negative = np.array(self.n_lime_true_negative)
-    self.n_intgrad_true_negative = np.array(self.n_intgrad_true_negative)
-    self.n_grad_true_negative = np.array(self.n_grad_true_negative)
-    self.n_shap_true_positive = np.array(self.n_shap_true_positive)
-    self.n_lime_true_positive = np.array(self.n_lime_true_positive)
-    self.n_intgrad_true_positive = np.array(self.n_intgrad_true_positive)
-    self.n_grad_true_positive = np.array(self.n_grad_true_positive)
-    self.n_oracle_positive = np.array(self.n_oracle_positive)
-    self.n_experiment_samples = np.array(self.n_experiment_samples)
+          self.experiment_params.n_experiment_samples[repetition_idx] += len(
+              feature_list) * len(class_list)
