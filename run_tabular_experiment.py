@@ -16,8 +16,10 @@ import tabular_experiment
 
 def main(unused_argv: Any) -> None:
   """Program entry point."""
-  recourse_experiment = tabular_experiment.TabularExperiment('wine_quality')
-  spurious_experiment = tabular_experiment.TabularExperiment('wine_quality')
+  recourse_experiment = tabular_experiment.TabularExperiment(
+      tabular_experiment.TabularDataset.WINE_QUALITY)
+  spurious_experiment = tabular_experiment.TabularExperiment(
+      tabular_experiment.TabularDataset.WINE_QUALITY)
 
   def model_trainer(
       features_train: np.ndarray, labels_train: np.ndarray,
