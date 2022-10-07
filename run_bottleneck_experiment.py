@@ -17,8 +17,10 @@ import models
 
 def main(unused_argv: Any) -> None:
   """Program entry point."""
-  recourse_experiment = bottleneck_experiment.BottleneckExperiment('cifar10')
-  spurious_experiment = bottleneck_experiment.BottleneckExperiment('cifar10')
+  recourse_experiment = bottleneck_experiment.BottleneckExperiment(
+      bottleneck_experiment.BottleneckDataset.CIFAR10)
+  spurious_experiment = bottleneck_experiment.BottleneckExperiment(
+      bottleneck_experiment.BottleneckDataset.CIFAR10)
 
   def model_trainer(features_train: np.ndarray, labels_train: np.ndarray,
                     features_test: np.ndarray, labels_test: np.ndarray,
