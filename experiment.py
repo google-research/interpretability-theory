@@ -179,11 +179,19 @@ class Experiment():
 
     colors = ['blue', 'orange', 'green', 'red']
 
-    for i in range(len(sensitivities)):
+    # for i in range(len(sensitivities)):
+    #   ax.scatter(sensitivities[i], specificities[i], color=colors[i])
+    # ax.scatter(1., 1., color='black')
+
+    # ax.legend(['Trivial', 'SHAP', 'IG', 'LIME', 'GRAD', 'Optimal'])
+
+    # only plot SHAP and IG for current paper version
+    for i in range(2):
       ax.scatter(sensitivities[i], specificities[i], color=colors[i])
     ax.scatter(1., 1., color='black')
+    # delete above and uncomment previous block to plot all
 
-    ax.legend(['Trivial', 'SHAP', 'IG', 'LIME', 'GRAD', 'Optimal'])
+    ax.legend(['Trivial', 'SHAP', 'IG', 'Optimal'])
 
     if filepath is not None:
       with gfile.Open(filepath + '.png', 'wb') as f:
@@ -215,6 +223,16 @@ class Experiment():
     xlabels = ['SHAP', 'IG', 'LIME', 'GRAD']
     xvals = range(1, len(xlabels) + 1)
     colors = ['blue', 'orange', 'green', 'red']
+    
+    # only plot SHAP and IG for current paper version
+    xlabels = xlabels[0:2]
+    xvals = range(1, len(xlabels) + 1)
+    color = colors[0:2]
+    mean_accuracies = mean_accuracies[0:2]
+    std_accuracies = std_accuracies[0:2]
+    # delete above to plot all
+    
+    
     plt.bar(
         xvals, mean_accuracies, color=colors, alpha=0.5, yerr=std_accuracies)
     plt.xticks(xvals, xlabels)
