@@ -43,7 +43,7 @@ def main(unused_argv: Any) -> None:
       interpretability_methods.recourse_oracle,
       interpretability_methods.recourse_hypothesis_test,
       model_trainer,
-      n_repetitions=3,
+      n_repetitions=10,
       n_concepts=8)
   recourse_experiment.visualize_experiment_table()
   recourse_experiment.visualize_hypothesis_test(
@@ -57,7 +57,7 @@ def main(unused_argv: Any) -> None:
       interpretability_methods.spurious_oracle,
       interpretability_methods.spurious_hypothesis_test,
       model_trainer,
-      n_repetitions=3,
+      n_repetitions=10,
       n_concepts=8)
   spurious_experiment.visualize_experiment_table()
   spurious_experiment.visualize_hypothesis_test(
