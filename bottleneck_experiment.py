@@ -93,6 +93,9 @@ class BottleneckExperiment(experiment.Experiment):
     self.experiment_params.reset(n_repetitions)
 
     for repetition_idx in range(n_repetitions):
+      
+      # used only for spurious features, but hackily pass it to both tests
+      spurious_feature_quantile = np.random.uniform(low=0.1, high=0.8)
 
       sample_idxs = np.random.randint(0, self.n_data, n_train_samples)
       sample_features_data = self.features_data[sample_idxs]
@@ -126,15 +129,15 @@ class BottleneckExperiment(experiment.Experiment):
           ]
           feature_list = np.array(range(n_concepts))
           oracle_value = oracle(decoder_model, example, class_list,
-                                feature_list)
+                                feature_list, spurious_feature_quantile=spurious_feature_quantile)
           shap_value = hypothesis_test(
               interpretability_methods.shap(decoder_model_evaluated, example,
                                             class_list, feature_list,
-                                            features_encoded))
+                                            features_encoded), spurious_feature_quantile)
           lime_value = hypothesis_test(
               interpretability_methods.lime(
                   decoder_model, example, class_list, feature_list,
-                  reg_param=2))
+                  reg_param=2), spurious_feature_quantile)
 
           intgrad_value = hypothesis_test(
               interpretability_methods.integrated_gradient(
@@ -143,11 +146,11 @@ class BottleneckExperiment(experiment.Experiment):
                   class_list,
                   feature_list,
                   baseline,
-                  num_iters=20))
+                  num_iters=20), spurious_feature_quantile)
 
           grad_value = hypothesis_test(
               interpretability_methods.gradient(decoder_model, example,
-                                                class_list, feature_list))
+                                                class_list, feature_list), spurious_feature_quantile)
 
           # how many 1's
           self.experiment_params.n_oracle_positive[repetition_idx] += np.sum(
