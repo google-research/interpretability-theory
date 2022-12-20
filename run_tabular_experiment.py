@@ -42,7 +42,7 @@ def main(unused_argv: Any) -> None:
       interpretability_methods.recourse_oracle,
       interpretability_methods.recourse_hypothesis_test,
       model_trainer,
-      n_repetitions=3)
+      n_repetitions=10)
   recourse_experiment.visualize_experiment_table()
   recourse_experiment.visualize_hypothesis_test(
       'Wine Recourse Hypothesis Tradeoff',
@@ -55,7 +55,7 @@ def main(unused_argv: Any) -> None:
       interpretability_methods.spurious_oracle,
       interpretability_methods.spurious_hypothesis_test,
       model_trainer,
-      n_repetitions=3)
+      n_repetitions=10)
   spurious_experiment.visualize_experiment_table()
   spurious_experiment.visualize_hypothesis_test(
       'Wine Spurious Hypothesis Tradeoff',
