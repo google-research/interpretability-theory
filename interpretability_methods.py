@@ -163,11 +163,11 @@ def gradient(model: Callable[[np.ndarray], np.ndarray], example: np.ndarray,
 
 def recourse_oracle(model: Callable[[np.ndarray], np.ndarray],
                     example: np.ndarray,
-                    class_list: list[int],
+                    class_list: List[int],
                     feature_list: np.ndarray,
-                    delta: float = 1.) -> np.ndarray:
+                    delta: float = 1.,
+                    spurious_feature_quantile: float = 0.2) -> np.ndarray:
   """Function to compute the correct direction for recourse.
-
   Args:
     model: function that maps features (dimension p) to probabilities over
       classes (dimension k)
@@ -175,7 +175,7 @@ def recourse_oracle(model: Callable[[np.ndarray], np.ndarray],
     class_list: classes to get interpretation for, subset of {0,...,k-1}
     feature_list: features to get interpretation for, subset of {0,...,p-1}
     delta: radius of interval to consider perturbing the feature over
-
+    spurious_feature_quantile: irrelevant parameter, needed for spurious features
   Returns:
     0/1 valued array of dimension (len(feature_list), len(class_list))
     0: decreasing feature increases class probability,
@@ -218,12 +218,11 @@ def recourse_oracle(model: Callable[[np.ndarray], np.ndarray],
 
 def spurious_oracle(model: Callable[[np.ndarray], np.ndarray],
                     example: np.ndarray,
-                    class_list: list[int],
+                    class_list: List[int],
                     feature_list: np.ndarray,
                     delta: float = 1.,
-                    quantile: float = 0.2) -> np.ndarray:
+                    spurious_feature_quantile: float = 0.2) -> np.ndarray:
   """Function to compute whether model output is sensitive to features.
-
   Args:
     model: function that maps features (dimension p) to probabilities over
       classes (dimension k)
@@ -231,8 +230,7 @@ def spurious_oracle(model: Callable[[np.ndarray], np.ndarray],
     class_list: classes to get interpretation for, subset of {0,...,k-1}
     feature_list: features to get interpretation for, subset of {0,...,p-1}
     delta: radius of interval to consider perturbing the feature over
-    quantile: determining factor of what constitutes "meaningful"
-
+    spurious_feature_quantile: determining factor of what constitutes "meaningful"
   Returns:
     0/1 valued array of dimension (len(feature_list), len(class_list))
     0: model output insensistive to feature,
@@ -257,17 +255,17 @@ def spurious_oracle(model: Callable[[np.ndarray], np.ndarray],
       ]),
       axis=1)[:, class_list]
 
-  return 1. * (example_std >= np.quantile(example_std, quantile))
+  return 1. * (example_std >= np.quantile(example_std, spurious_feature_quantile))
 
 
 def recourse_hypothesis_test(
-    interpretability_method_output: np.ndarray) -> np.ndarray:
+    interpretability_method_output: np.ndarray,
+    spurious_feature_quantile: float = 0.2) -> np.ndarray:
   """Function to convert interpretability method to recourse hypothesis test.
-
   Args:
     interpretability_method_output: the array of feature attribution from an
       interpretability method
-
+    spurious_feature_quantile: irrelevant parameter, needed for spurious features
   Returns:
     array of same shape as input, but thresholded for whether the attribution
     was positive or negative
@@ -276,18 +274,16 @@ def recourse_hypothesis_test(
 
 
 def spurious_hypothesis_test(interpretability_method_output: np.ndarray,
-                             quantile: float = 0.2) -> np.ndarray:
+                             spurious_feature_quantile: float = 0.2) -> np.ndarray:
   """Function to convert interpretability method to spurious features hypothesis test.
-
   Args:
     interpretability_method_output: the array of feature attribution from an
       interpretability method
-    quantile: determining factor of what constitutes "meaningful"
-
+    spurious_feature_quantile: determining factor of what constitutes "meaningful"
   Returns:
     array of same shape as input, but thresholded for whether the absolute
     value of the attribution was (meaningfully) large
   """
   return 1. * (
       np.abs(interpretability_method_output) >= np.quantile(
-          np.abs(interpretability_method_output), quantile))
+          np.abs(interpretability_method_output), spurious_feature_quantile))
