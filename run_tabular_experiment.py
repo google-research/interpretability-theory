@@ -45,10 +45,10 @@ def main(unused_argv: Any) -> None:
       n_repetitions=10)
   recourse_experiment.visualize_experiment_table()
   recourse_experiment.visualize_hypothesis_test(
-      'Wine Recourse Hypothesis Tradeoff',
+      'Sens vs. Spec on Wine Data for Recourse Task',
       basepath + 'wine-recourse-hypothesis-tradeoff-cl')
   recourse_experiment.visualize_accuracy(
-      'Wine Recourse Accuracy Tradeoff',
+      'Accuracy on Wine Data for Recourse Task',
       basepath + 'wine-recourse-accuracy-tradeoff-cl')
 
   spurious_experiment.run_experiment(
@@ -58,10 +58,10 @@ def main(unused_argv: Any) -> None:
       n_repetitions=10)
   spurious_experiment.visualize_experiment_table()
   spurious_experiment.visualize_hypothesis_test(
-      'Wine Spurious Hypothesis Tradeoff',
+      'Sens vs. Spec on Wine Data for Spurious Features Task',
       basepath + 'wine-spurious-hypothesis-tradeoff-cl')
   spurious_experiment.visualize_accuracy(
-      'Wine Spurious Accuracy Tradeoff',
+      'Accuracy on Wine Data for Spurious Features Task',
       basepath + 'wine-spurious-accuracy-tradeoff-cl')
 
 
