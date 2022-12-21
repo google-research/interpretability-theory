@@ -47,10 +47,10 @@ def main(unused_argv: Any) -> None:
       n_concepts=8)
   recourse_experiment.visualize_experiment_table()
   recourse_experiment.visualize_hypothesis_test(
-      'CIFAR10 Recourse Hypothesis Tradeoff',
+      'Sens vs. Spec on CIFAR-10 for Recourse Task',
       basepath + 'cifar10-recourse-hypothesis-tradeoff-cl')
   recourse_experiment.visualize_accuracy(
-      'CIFAR10 Recourse Accuracy Tradeoff',
+      'Accuracy on CIFAR-10 for Recourse Task',
       basepath + 'cifar10-recourse-accuracy-tradeoff-cl')
 
   spurious_experiment.run_experiment(
@@ -61,10 +61,10 @@ def main(unused_argv: Any) -> None:
       n_concepts=8)
   spurious_experiment.visualize_experiment_table()
   spurious_experiment.visualize_hypothesis_test(
-      'CIFAR10 Spurious Hypothesis Tradeoff',
+      'Sens vs. Spec on CIFAR-10 for Spurious Features Task',
       basepath + 'cifar10-spurious-hypothesis-tradeoff-cl')
   spurious_experiment.visualize_accuracy(
-      'CIFAR10 Spurious Accuracy Tradeoff',
+      'Accuracy on CIFAR-10 for Spurious Features Task',
       basepath + 'cifar10-spurious-accuracy-tradeoff-cl')
 
 
